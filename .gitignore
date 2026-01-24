@@ -1,0 +1,9 @@
+.env
+data/
+logs/
+mysql_data/
+tugraph_data/
+tugraph_log/
+test_data.csv
+*.log
+.DS_Store

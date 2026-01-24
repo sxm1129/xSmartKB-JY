@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: xsmartkg-mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-hs@A1b2c3d4e5}
+      - MYSQL_DATABASE=${DB_NAME:-dbgpt}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./init/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$${DB_PASSWORD:-hs@A1b2c3d4e5}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # TuGraph 图数据库
+  tugraph:
+    image: tugraph/tugraph-runtime-centos7:latest
+    container_name: xsmartkg-tugraph
+    restart: always
+    ports:
+      - "7687:7687"
+      - "8888:8888"
+    volumes:
+      - ./tugraph_data:/var/lib/lgraph
+      - ./tugraph_log:/var/log/lgraph
+    environment:
+      - LGRAPH_PASSWORD=${GRAPH_PASSWORD:-73@TuGraph}
+
+  # 后端服务
+  xsmartkg-backend:
+    image: ${REGISTRY}/${NAMESPACE}/xsmartkg-backend:latest
+    container_name: xsmartkg-backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+      tugraph:
+        condition: service_started
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME:-dbgpt}
+      - DB_USER=root
+      - DB_PASSWORD=${DB_PASSWORD:-hs@A1b2c3d4e5}
+      - GRAPH_HOST=tugraph
+      - GRAPH_PORT=7687
+      - GRAPH_USER=admin
+      - GRAPH_PASSWORD=${GRAPH_PASSWORD:-73@TuGraph}
+      - ALI_APIKEY=${ALI_APIKEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - MOMENTS8_API_KEY=${MOMENTS8_API_KEY}
+      - MOMENTS8_API_BASE=${MOMENTS8_API_BASE}
+    volumes:
+      - ./data:/app/pilot/data
+      - ./logs:/app/pilot/logs
+      - ./configs/dbgpt-hs-custom.toml:/app/configs/dbgpt-hs-custom.toml
+    ports:
+      - "5670:5670"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5670/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: python -m dbgpt.cli.cli_scripts start webserver --config /app/configs/dbgpt-hs-custom.toml
+
+  # 前端服务
+  xsmartkg-frontend:
+    image: ${REGISTRY}/${NAMESPACE}/xsmartkg-frontend:latest
+    container_name: xsmartkg-frontend
+    restart: always
+    environment:
+      - BACKEND_HOST=xsmartkg-backend
+      - BACKEND_PORT=5670
+    ports:
+      - "80:80"
+    depends_on:
+      - xsmartkg-backend

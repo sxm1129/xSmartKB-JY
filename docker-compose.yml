@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # 后端服务
+  xsmartkg-backend:
+    image: ${REGISTRY}/${NAMESPACE}/xsmartkg-backend:latest
+    container_name: xsmartkg-backend
+    restart: always
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - GRAPH_HOST=${GRAPH_HOST}
+      - GRAPH_PORT=${GRAPH_PORT}
+      - GRAPH_USER=${GRAPH_USER}
+      - GRAPH_PASSWORD=${GRAPH_PASSWORD}
+      - ALI_APIKEY=${ALI_APIKEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - MOMENTS8_API_KEY=${MOMENTS8_API_KEY}
+      - MOMENTS8_API_BASE=${MOMENTS8_API_BASE}
+    volumes:
+      - ./data:/app/pilot/data
+      - ./logs:/app/pilot/logs
+      - ./configs/dbgpt-hs-custom.toml:/app/configs/dbgpt-hs-custom.toml
+    ports:
+      - "5670:5670"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5670/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: python -m dbgpt.cli.cli_scripts start webserver --config /app/configs/dbgpt-hs-custom.toml
+
+  # 前端服务
+  xsmartkg-frontend:
+    image: ${REGISTRY}/${NAMESPACE}/xsmartkg-frontend:latest
+    container_name: xsmartkg-frontend
+    restart: always
+    environment:
+      - BACKEND_HOST=xsmartkg-backend
+      - BACKEND_PORT=5670
+    ports:
+      - "80:80"
+    depends_on:
+      - xsmartkg-backend
