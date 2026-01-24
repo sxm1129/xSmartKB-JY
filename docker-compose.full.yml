@@ -22,7 +22,7 @@ services:
 
   # TuGraph 图数据库
   tugraph:
-    image: tugraph/tugraph-runtime-centos7:latest
+    image: fxregistry-registry.cn-beijing.cr.aliyuncs.com/moments8/tugraph:latest
     container_name: xsmartkg-tugraph
     restart: always
     ports:
@@ -80,6 +80,6 @@ services:
       - BACKEND_HOST=xsmartkg-backend
       - BACKEND_PORT=5670
     ports:
-      - "80:80"
+      - "8880:80"
     depends_on:
       - xsmartkg-backend
