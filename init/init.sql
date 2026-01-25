@@ -673,3 +673,8 @@ CREATE TABLE IF NOT EXISTS knowledge_graph_upload_file (
 
 -- 验证表是否创建成功
 SHOW TABLES LIKE 'knowledge_graph_upload%';
+
+-- Initialize TuGraph Connection
+INSERT INTO connect_config (db_type, db_name, db_host, db_port, db_user, db_pwd, comment, gmt_created, gmt_modified)
+SELECT 'TuGraph', 'TuGraph_Local', 'xsmartkg-tugraph', '7687', 'admin', '73@TuGraph', 'Auto-initialized Local TuGraph Connection', NOW(), NOW()
+WHERE NOT EXISTS (SELECT 1 FROM connect_config WHERE db_name = 'TuGraph_Local');

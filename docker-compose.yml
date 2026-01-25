@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # 后端服务
   xsmartkg-backend:
-    image: ${REGISTRY}/${NAMESPACE}/xsmartkg-backend:latest
+    image: crpi-feit7ei40cgu7xjt.cn-shenzhen.personal.cr.aliyuncs.com/hs_public/xsmartkg-backend:latest
     container_name: xsmartkg-backend
     restart: always
     environment:
@@ -20,6 +20,9 @@ services:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - MOMENTS8_API_KEY=${MOMENTS8_API_KEY}
       - MOMENTS8_API_BASE=${MOMENTS8_API_BASE}
+      # File Storage Configuration (Prevent IP hardcoding)
+      - DBGPT_SERVE_FILE_HOST=xsmartkg-backend
+      - DBGPT_SERVE_FILE_PORT=5670
     volumes:
       - ./data:/app/pilot/data
       - ./logs:/app/pilot/logs
@@ -32,16 +35,17 @@ services:
       timeout: 10s
       retries: 3
     command: python -m dbgpt.cli.cli_scripts start webserver --config /app/configs/dbgpt-hs-custom.toml
+    # command: sleep infinity
 
   # 前端服务
   xsmartkg-frontend:
-    image: ${REGISTRY}/${NAMESPACE}/xsmartkg-frontend:latest
+    image: crpi-feit7ei40cgu7xjt.cn-shenzhen.personal.cr.aliyuncs.com/hs_public/xsmartkg-frontend:latest
     container_name: xsmartkg-frontend
     restart: always
     environment:
       - BACKEND_HOST=xsmartkg-backend
       - BACKEND_PORT=5670
     ports:
-      - "80:80"
+      - "8880:80"
     depends_on:
       - xsmartkg-backend

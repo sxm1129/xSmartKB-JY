@@ -22,7 +22,7 @@ services:
 
   # TuGraph 图数据库
   tugraph:
-    image: fxregistry-registry.cn-beijing.cr.aliyuncs.com/moments8/tugraph:latest
+    image: tugraph/tugraph-runtime-centos7:latest
     container_name: xsmartkg-tugraph
     restart: always
     ports:
@@ -36,7 +36,7 @@ services:
 
   # 后端服务
   xsmartkg-backend:
-    image: ${REGISTRY}/${NAMESPACE}/xsmartkg-backend:latest
+    image: crpi-feit7ei40cgu7xjt.cn-shenzhen.personal.cr.aliyuncs.com/hs_public/xsmartkg-backend:latest
     container_name: xsmartkg-backend
     restart: always
     depends_on:
@@ -57,7 +57,11 @@ services:
       - ALI_APIKEY=${ALI_APIKEY}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - MOMENTS8_API_KEY=${MOMENTS8_API_KEY}
+      - MOMENTS8_API_KEY=${MOMENTS8_API_KEY}
       - MOMENTS8_API_BASE=${MOMENTS8_API_BASE}
+      # File Storage Configuration (Prevent IP hardcoding)
+      - DBGPT_SERVE_FILE_HOST=xsmartkg-backend
+      - DBGPT_SERVE_FILE_PORT=5670
     volumes:
       - ./data:/app/pilot/data
       - ./logs:/app/pilot/logs
@@ -73,7 +77,7 @@ services:
 
   # 前端服务
   xsmartkg-frontend:
-    image: ${REGISTRY}/${NAMESPACE}/xsmartkg-frontend:latest
+    image: crpi-feit7ei40cgu7xjt.cn-shenzhen.personal.cr.aliyuncs.com/hs_public/xsmartkg-frontend:latest
     container_name: xsmartkg-frontend
     restart: always
     environment:
