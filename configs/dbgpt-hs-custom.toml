@@ -2,7 +2,7 @@
 # 配置说明：
 # - LLM 主力模型: 阿里百炼 qwen-turbo
 # - 备用模型: OpenRouter Claude 3 Haiku
-# - 数据库: 远程 MySQL
+# - 数据库: 本地 MySQL
 # - 向量存储: 本地 ChromaDB
 
 [system]
@@ -18,10 +18,10 @@ port = 5670
 # MySQL 数据库配置
 [service.web.database]
 type = "mysql"
-host = "${env:DB_HOST:-39.102.122.9}"
+host = "${env:DB_HOST:-mysql}"
 port = "${env:DB_PORT:-3306}"
 database = "${env:DB_NAME:-dbgpt}"
-user = "${env:DB_USER:-sxm1129}"
+user = "${env:DB_USER:-root}"
 password = "${env:DB_PASSWORD}"
 
 # RAG 存储配置
@@ -35,10 +35,10 @@ persist_path = "pilot/data"
 # 知识图谱存储 - TuGraph (GraphRAG)
 [rag.storage.graph]
 type = "tugraph"
-host = "${env:GRAPH_HOST:-47.92.252.1}"
+host = "${env:GRAPH_HOST:-tugraph}"
 port = 7687
 username = "admin"
-password = "73@TuGraph"
+password = "${env:GRAPH_PASSWORD:-73@TuGraph}"
 
 # GraphRAG 高级配置
 enable_summary = "True"                    # 启用社区摘要

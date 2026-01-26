@@ -29,7 +29,7 @@ docker compose -f docker-compose.full.yml up -d
 ```
 
 ### 4. 访问服务
-- **Web 界面**: [http://localhost](http://localhost)
+- **Web 界面**: [http://localhost:8880](http://localhost:8880)
 - **后端 API**: [http://localhost:5670](http://localhost:5670)
 - **TuGraph 视图**: [http://localhost:8888](http://localhost:8888)
 

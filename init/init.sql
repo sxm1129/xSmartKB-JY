@@ -621,8 +621,9 @@ VALUES ('user_18', 'password_18', 'user_18@example.com', '12345678908');
 INSERT INTO users (username, password, email, phone)
 VALUES ('user_19', 'password_19', 'user_19@example.com', '12345678909');
 INSERT INTO users (username, password, email, phone)
-VALUES ('user_20', 'password_20', 'user_20@example.com', '12345678900');-- Knowledge Graph Upload Service 数据库初始化脚本
--- 执行方式: mysql -h39.102.122.9 -usxm1129 -p dbgpt < init_kg_schema.sql
+VALUES ('user_20', 'password_20', 'user_20@example.com', '12345678900');
+
+-- Knowledge Graph Upload Service 数据库初始化脚本
 
 -- 创建任务表
 CREATE TABLE IF NOT EXISTS knowledge_graph_upload_task (
@@ -675,6 +676,10 @@ CREATE TABLE IF NOT EXISTS knowledge_graph_upload_file (
 SHOW TABLES LIKE 'knowledge_graph_upload%';
 
 -- Initialize TuGraph Connection
-INSERT INTO connect_config (db_type, db_name, db_host, db_port, db_user, db_pwd, comment, gmt_created, gmt_modified)
-SELECT 'TuGraph', 'TuGraph_Local', 'xsmartkg-tugraph', '7687', 'admin', '73@TuGraph', 'Auto-initialized Local TuGraph Connection', NOW(), NOW()
-WHERE NOT EXISTS (SELECT 1 FROM connect_config WHERE db_name = 'TuGraph_Local');
+-- 确保在 dbgpt 数据库中执行
+USE dbgpt;
+
+-- 初始化 default TuGraph 连接（后端服务使用的默认名称）
+INSERT INTO connect_config (db_type, db_name, db_host, db_port, db_user, db_pwd, comment)
+VALUES ('tugraph', 'default', 'tugraph', '7687', 'admin', '73@TuGraph', 'Auto-initialized Local TuGraph Connection')
+ON DUPLICATE KEY UPDATE db_host='tugraph', db_port='7687', db_user='admin', db_pwd='73@TuGraph';
