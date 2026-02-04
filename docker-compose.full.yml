@@ -22,7 +22,7 @@ services:
 
   # TuGraph 图数据库
   tugraph:
-    image: fxregistry-registry.cn-beijing.cr.aliyuncs.com/moments8/tugraph:latest
+    image: crpi-feit7ei40cgu7xjt.cn-shenzhen.personal.cr.aliyuncs.com/hs_public/tugraph:latest
     container_name: xsmartkg-tugraph
     restart: always
     ports:
